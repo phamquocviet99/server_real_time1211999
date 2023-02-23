@@ -9,6 +9,7 @@ const { Server } = require("socket.io");
 const delay = require("delay");
 const { restart } = require("nodemon");
 app.use(cors());
+const path = require('path');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -45,6 +46,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("hủy kết nối");
   });
+});
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, './index.html'));
 });
 
 server.listen(PORT, () => {
