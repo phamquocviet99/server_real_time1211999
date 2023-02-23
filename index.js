@@ -17,9 +17,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
+    origin: '*',
+  }
 });
 let onlineVendor = [];
 const addNewVendor = (vendorId, socketId) => {
