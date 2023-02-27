@@ -9,7 +9,7 @@ const { Server } = require("socket.io");
 const delay = require("delay");
 const { restart } = require("nodemon");
 app.use(cors());
-const path = require('path');
+const path = require("path");
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -18,8 +18,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 const io = new Server(server, {
   cors: {
-    origin: '*',
-  }
+    origin: "*",
+  },
 });
 let onlineVendor = [];
 const addNewVendor = (vendorId, socketId) => {
@@ -48,8 +48,8 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname, './index.html'));
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "./index.html"));
 });
 
 server.listen(PORT, () => {
@@ -58,8 +58,8 @@ server.listen(PORT, () => {
 
 app.post("/addRoom", (req, res) => {
   const socketId = req.body.socketId;
-  const room = req.body.room;
-  if (!socketId || !room.length)
+  const rooms = req.body.rooms;
+  if (!socketId || !rooms.length)
     return res.status(404).json({ message: "Không để trống" });
   try {
     const my_socket = io.sockets.sockets.get(socketId);
@@ -67,7 +67,7 @@ app.post("/addRoom", (req, res) => {
       return res
         .status(404)
         .json({ message: "Đối tượng không tồn tại hoặc đã off" });
-    my_socket.join(room);
+    my_socket.join(rooms);
     return res.status(200).json({ success: true, code: 0 });
   } catch (err) {
     return res.status(500).json({ success: false, code: 0, error: err });
@@ -76,8 +76,8 @@ app.post("/addRoom", (req, res) => {
 
 app.delete("/removeClientInRoom", (req, res) => {
   const socketId = req.body.socketId;
-  const room = req.body.room;
-  if (!socketId || !room.length)
+  const rooms = req.body.rooms;
+  if (!socketId || !rooms.length)
     return res.status(404).json({ message: "Không để trống" });
 
   try {
@@ -87,8 +87,8 @@ app.delete("/removeClientInRoom", (req, res) => {
         .status(404)
         .json({ message: "Đối tượng không tồn tại hoặc đã off" });
 
-    for (let i in room) {
-      my_socket.leave(room[i]);
+    for (let i in rooms) {
+      my_socket.leave(rooms[i]);
     }
     // const clients = io.sockets.adapter.rooms.get(room); lấy clients trong phòng
     // console.log(clients);
@@ -100,12 +100,13 @@ app.delete("/removeClientInRoom", (req, res) => {
 });
 
 app.post("/sendRoom", (req, res) => {
-  const room = req.body.room;
+  const rooms = req.body.rooms;
   const data = req.body.data;
-  if (!data || !room.length)
+  const cmd = req.body.cmd;
+  if (!data || !rooms.length)
     return res.status(404).json({ message: "Không để trống" });
   try {
-    io.to(room).emit("check", { data: data });
+    io.to(rooms).emit("check", { data: data, cmd: cmd });
     return res.status(200).json({ success: true, code: 0 });
   } catch (err) {
     return res.status(500).json({ success: false, code: 0, error: err });
