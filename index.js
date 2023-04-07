@@ -59,8 +59,15 @@ server.listen(PORT, () => {
 app.post("/addRoom", (req, res) => {
   const socketId = req.body.socketId;
   const rooms = req.body.rooms;
+  if (socketId === "" || rooms.length === 0) {
+    return res
+      .status(404)
+      .json({ message: "Không được để trống", success: false });
+  }
   if (!socketId || !rooms.length)
-    return res.status(404).json({ message: "Không để trống" });
+    return res
+      .status(404)
+      .json({ message: "Không tìm thấy đối tượng", success: false });
   try {
     const my_socket = io.sockets.sockets.get(socketId);
     if (my_socket === undefined)
